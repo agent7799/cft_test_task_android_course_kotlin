@@ -44,7 +44,8 @@ class PlainActivity : AppCompatActivity() {
 
     private inner class JsonTask : AsyncTask<String?, String?, String?>() {
 
-        override fun doInBackground(vararg p0: String?): String? {
+        @Deprecated("Deprecated in Java")
+        override fun doInBackground(vararg p0: String?): String {
             Log.d(tag, "---doInBackground---")
 
             val stringFromWeb = getStringFromUrl(cardBin, url )

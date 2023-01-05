@@ -13,17 +13,18 @@ import androidx.appcompat.app.AppCompatActivity
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var cardBin = 0
     private val historyRequests = ArrayList<String>()
-    var shared: SharedPreferences? = null
-    var stringArrayAdapter: ArrayAdapter<String>? = null
+    private lateinit var shared: SharedPreferences
+    private var stringArrayAdapter: ArrayAdapter<String>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        shared = this.getSharedPreferences("com.example.myapplication", MODE_PRIVATE)
         findViewById<Button>(R.id.about_button)
         findViewById<Button>(R.id.clear_history_button)
         val editText = findViewById<EditText>(R.id.editTextNumberSigned)
         val historyList = findViewById<ListView>(R.id.historyListView)
-        shared = getSharedPreferences("com.example.myapplication", MODE_PRIVATE)
+
 
         stringArrayAdapter = ArrayAdapter(
             this,
@@ -33,7 +34,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         historyList.adapter = stringArrayAdapter
 
         historyList.onItemClickListener =
-            OnItemClickListener { parent, itemClicked, position, id ->
+            OnItemClickListener { _, itemClicked, _, _ ->
                 val textView = itemClicked as TextView
                 val strText = textView.text.toString() // получаем текст нажатого элемента
                 cardBin = strText.toInt()
@@ -52,7 +53,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             stringArrayAdapter!!.notifyDataSetChanged()
         }
 
-        editText.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+        editText.setOnKeyListener(View.OnKeyListener { _, keyCode, event ->
             if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
                 val temp = editText.text.toString()
                 if (temp != "") {
@@ -100,7 +101,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun saveSharedPreferences() {
-        val editor = shared!!.edit()
+        val editor = shared.edit()
+        editor.clear()
         val set: MutableSet<String> = HashSet()
         set.addAll(historyRequests)
         editor.putStringSet("key", set)
@@ -109,7 +111,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun retrieveSharedValue() {
-        val set = shared!!.getStringSet("key", null)
+        val set = shared.getStringSet("key", setOfNotNull())
         historyRequests.clear()
         historyRequests.addAll(set!!)
         Log.d("retrieveSharedValue", "history array$historyRequests")
